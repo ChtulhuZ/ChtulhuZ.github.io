@@ -1,4 +1,3 @@
-
 export enum UpgradeType {
   CLICK = 'CLICK',
   AUTO = 'AUTO',
@@ -13,7 +12,7 @@ export interface Upgrade {
   type: UpgradeType;
   value: number; // e.g., +1 per click or +0.5 per second
   costIncreaseFactor: number;
-  icon: React.ReactNode;
+  icon: string;
 }
 
 export interface FloatingText {

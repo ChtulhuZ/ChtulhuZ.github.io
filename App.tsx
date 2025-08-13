@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Upgrade, UpgradeType } from './types';
 import { INITIAL_UPGRADES } from './constants';
@@ -6,9 +5,41 @@ import Earth from './components/Earth';
 import UpgradeStore from './components/UpgradeStore';
 import SageAdvice from './components/SageAdvice';
 
+const SAVE_KEY = 'terra-clicker-save';
+
+interface GameState {
+  score: number;
+  upgrades: Upgrade[];
+}
+
 const App: React.FC = () => {
-  const [score, setScore] = useState<number>(0);
-  const [upgrades, setUpgrades] = useState<Upgrade[]>(INITIAL_UPGRADES);
+  const [gameState, setGameState] = useState<GameState>(() => {
+    try {
+      const savedState = localStorage.getItem(SAVE_KEY);
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+        // Integrity check: ensure saved upgrades match initial upgrades structure
+        if (parsedState.upgrades && parsedState.upgrades.length === INITIAL_UPGRADES.length) {
+            return parsedState;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load saved state:", error);
+    }
+    return { score: 0, upgrades: INITIAL_UPGRADES };
+  });
+
+  const { score, upgrades } = gameState;
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+    } catch (error) {
+      console.error("Failed to save state:", error);
+    }
+  }, [gameState]);
+
 
   const clickPower = useMemo(() => {
     return upgrades
@@ -23,39 +54,55 @@ const App: React.FC = () => {
   }, [upgrades]);
 
   const handleEarthClick = useCallback(() => {
-    setScore(currentScore => currentScore + clickPower);
+    setGameState(current => ({
+      ...current,
+      score: current.score + clickPower
+    }));
   }, [clickPower]);
 
   const handleBuyUpgrade = useCallback((id: string) => {
-    setUpgrades(currentUpgrades => {
-      const upgradeIndex = currentUpgrades.findIndex(u => u.id === id);
-      if (upgradeIndex === -1) return currentUpgrades;
+    setGameState(current => {
+      const { score, upgrades } = current;
+      const upgradeIndex = upgrades.findIndex(u => u.id === id);
+      if (upgradeIndex === -1) return current;
 
-      const upgrade = currentUpgrades[upgradeIndex];
-      if (score < upgrade.cost) return currentUpgrades;
+      const upgrade = upgrades[upgradeIndex];
+      if (score < upgrade.cost) return current;
 
-      setScore(currentScore => currentScore - upgrade.cost);
-
-      const newUpgrades = [...currentUpgrades];
+      const newUpgrades = [...upgrades];
       newUpgrades[upgradeIndex] = {
         ...upgrade,
         level: upgrade.level + 1,
         cost: upgrade.cost * upgrade.costIncreaseFactor,
       };
 
-      return newUpgrades;
+      return {
+        score: score - upgrade.cost,
+        upgrades: newUpgrades,
+      };
     });
-  }, [score]);
+  }, []);
 
+  // Game tick for auto-income
   useEffect(() => {
     const gameTick = setInterval(() => {
       if (autoIncomePerSecond > 0) {
-        setScore(currentScore => currentScore + autoIncomePerSecond);
+        setGameState(current => ({
+            ...current,
+            score: current.score + autoIncomePerSecond / 10
+        }));
       }
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(gameTick);
   }, [autoIncomePerSecond]);
+
+  const handleResetProgress = () => {
+    if (window.confirm("Sei sicuro di voler resettare tutti i progressi? Questa azione è irreversibile.")) {
+        localStorage.removeItem(SAVE_KEY);
+        setGameState({ score: 0, upgrades: INITIAL_UPGRADES });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex flex-col items-center justify-center p-4 font-sans">
@@ -88,9 +135,12 @@ const App: React.FC = () => {
         </aside>
       </div>
 
-      {/* Gemini Advice Section */}
-      <footer className="mt-8 w-full flex justify-center">
+      {/* Gemini Advice Section & Footer */}
+      <footer className="mt-8 w-full flex flex-col items-center gap-4">
         <SageAdvice />
+        <button onClick={handleResetProgress} className="text-xs text-slate-500 hover:text-red-400 transition-colors mt-2">
+            Resetta Progressi
+        </button>
       </footer>
     </div>
   );

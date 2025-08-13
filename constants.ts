@@ -1,6 +1,4 @@
 import { Upgrade, UpgradeType } from './types';
-import { ShovelIcon, WaterDropIcon, LeafIcon, TractorIcon } from './components/IconComponents';
-import React from 'react';
 
 export const INITIAL_UPGRADES: Upgrade[] = [
   {
@@ -12,7 +10,7 @@ export const INITIAL_UPGRADES: Upgrade[] = [
     type: UpgradeType.CLICK,
     value: 1,
     costIncreaseFactor: 1.15,
-    icon: React.createElement(ShovelIcon),
+    icon: 'ShovelIcon',
   },
   {
     id: 'water_well',
@@ -23,7 +21,7 @@ export const INITIAL_UPGRADES: Upgrade[] = [
     type: UpgradeType.AUTO,
     value: 1,
     costIncreaseFactor: 1.2,
-    icon: React.createElement(WaterDropIcon),
+    icon: 'WaterDropIcon',
   },
   {
     id: 'fertilizer',
@@ -34,7 +32,7 @@ export const INITIAL_UPGRADES: Upgrade[] = [
     type: UpgradeType.AUTO,
     value: 5,
     costIncreaseFactor: 1.25,
-    icon: React.createElement(LeafIcon),
+    icon: 'LeafIcon',
   },
   {
     id: 'tractor',
@@ -45,6 +43,6 @@ export const INITIAL_UPGRADES: Upgrade[] = [
     type: UpgradeType.CLICK,
     value: 10,
     costIncreaseFactor: 1.18,
-    icon: React.createElement(TractorIcon),
+    icon: 'TractorIcon',
   },
 ];
