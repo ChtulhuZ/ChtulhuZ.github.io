@@ -1,0 +1,50 @@
+import { Upgrade, UpgradeType } from './types';
+import { ShovelIcon, WaterDropIcon, LeafIcon, TractorIcon } from './components/IconComponents';
+import React from 'react';
+
+export const INITIAL_UPGRADES: Upgrade[] = [
+  {
+    id: 'reinforced_shovel',
+    name: 'Pala Rinforzata',
+    description: '+1 per click',
+    cost: 10,
+    level: 0,
+    type: UpgradeType.CLICK,
+    value: 1,
+    costIncreaseFactor: 1.15,
+    icon: React.createElement(ShovelIcon),
+  },
+  {
+    id: 'water_well',
+    name: 'Pozzo d\'acqua',
+    description: '+1 al secondo',
+    cost: 50,
+    level: 0,
+    type: UpgradeType.AUTO,
+    value: 1,
+    costIncreaseFactor: 1.2,
+    icon: React.createElement(WaterDropIcon),
+  },
+  {
+    id: 'fertilizer',
+    name: 'Fertilizzante Organico',
+    description: '+5 al secondo',
+    cost: 250,
+    level: 0,
+    type: UpgradeType.AUTO,
+    value: 5,
+    costIncreaseFactor: 1.25,
+    icon: React.createElement(LeafIcon),
+  },
+  {
+    id: 'tractor',
+    name: 'Trattore',
+    description: '+10 per click',
+    cost: 1000,
+    level: 0,
+    type: UpgradeType.CLICK,
+    value: 10,
+    costIncreaseFactor: 1.18,
+    icon: React.createElement(TractorIcon),
+  },
+];
